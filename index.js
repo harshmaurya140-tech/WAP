@@ -1,60 +1,141 @@
-const API_KEY = "CabxRr94GhAAfVYvGce1V8Oog9NhYwAAyxpA0R";
+var API_KEY = "8eafd0d9";
 
-const searchBtn = document.getElementById("searchBtn");
-const input = document.getElementById("searchInput");
-const moviesDiv = document.getElementById("movies");
+var searchBtn = document.getElementById("searchBtn");
+var inputElement = document.getElementById("searchInput");
+var moviesDiv = document.getElementById("movies");
+var themeToggle = document.getElementById("themeToggle");
+var loadMoreBtn = document.getElementById("loadMoreBtn");
 
+var currentQuery = "";
+var currentPageNumber = 1;
 
-searchBtn.addEventListener("click", () => {
-  fetchMovies(input.value);
-});
-
-
-input.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") {
-    fetchMovies(input.value);
+function toggleTheme() {
+  var bodyElement = document.body;
+  if (bodyElement.classList.contains("light-mode")) {
+    bodyElement.classList.remove("light-mode");
+    themeToggle.textContent = "🌙";
+    localStorage.setItem("theme", "dark");
+  } else {
+    bodyElement.classList.add("light-mode");
+    themeToggle.textContent = "☀️";
+    localStorage.setItem("theme", "light");
   }
-});
+}
 
+function loadTheme() {
+  var savedTheme = localStorage.getItem("theme");
+  if (savedTheme === "light") {
+    document.body.classList.add("light-mode");
+    themeToggle.textContent = "☀️";
+  }
+}
 
-async function fetchMovies(query) {
-  if (!query) {
-    moviesDiv.innerHTML = `<p class="empty">Please enter a movie name</p>`;
+function startSearch() {
+  var query = inputElement.value;
+  
+  if (query === "") {
+    moviesDiv.innerHTML = "<p class='empty'>Please enter a movie name</p>";
+    loadMoreBtn.style.display = "none";
     return;
   }
+  
+  currentQuery = query;
+  currentPageNumber = 1;
+  moviesDiv.innerHTML = "<p class='empty'>Loading...</p>";
+  loadMoreBtn.style.display = "none";
+  
+  fetchMoviesFromAPI(currentQuery, currentPageNumber);
+}
 
-  moviesDiv.innerHTML = `<p class="empty">Loading...</p>`;
+function loadNextPage() {
+  currentPageNumber = currentPageNumber + 1;
+  fetchMoviesFromAPI(currentQuery, currentPageNumber);
+}
 
-  try {
-    const res = await fetch(`https://www.omdbapi.com/?s=${query}&apikey=${API_KEY}`);
-    const data = await res.json();
+function fetchMoviesFromAPI(query, pageNumber) {
+  var url = "https://www.omdbapi.com/?s=" + query + "&page=" + pageNumber + "&apikey=" + API_KEY;
+  
+  fetch(url)
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(data) {
+      if (data.Response === "False") {
+        if (pageNumber === 1) {
+          moviesDiv.innerHTML = "<p class='empty'>No movies found</p>";
+        }
+        loadMoreBtn.style.display = "none";
+        return;
+      }
+      
+      if (pageNumber === 1) {
+        moviesDiv.innerHTML = "";
+      }
+      
+      var moviesArray = data.Search;
+      displayMovies(moviesArray);
+      
+      var totalResults = parseInt(data.totalResults, 10);
+      var displayedResults = pageNumber * 10;
+      
+      if (displayedResults < totalResults) {
+        loadMoreBtn.style.display = "block";
+      } else {
+        loadMoreBtn.style.display = "none";
+      }
+    })
+    .catch(function(error) {
+      moviesDiv.innerHTML = "<p class='empty'>Error fetching data</p>";
+      loadMoreBtn.style.display = "none";
+    });
+}
 
-    if (data.Response === "False") {
-      moviesDiv.innerHTML = `<p class="empty">No movies found</p>`;
-      return;
+function displayMovies(movies) {
+  for (var i = 0; i < movies.length; i = i + 1) {
+    var movie = movies[i];
+    
+    var cardElement = document.createElement("div");
+    cardElement.classList.add("card");
+    
+    var imageElement = document.createElement("img");
+    if (movie.Poster !== "N/A") {
+      imageElement.setAttribute("src", movie.Poster);
+    } else {
+      imageElement.setAttribute("src", "");
     }
-
-    displayMovies(data.Search);
-
-  } catch (error) {
-    moviesDiv.innerHTML = `<p class="empty">Error fetching data</p>`;
+    
+    var titleElement = document.createElement("h3");
+    titleElement.textContent = movie.Title;
+    
+    var yearElement = document.createElement("p");
+    yearElement.textContent = movie.Year;
+    
+    cardElement.appendChild(imageElement);
+    cardElement.appendChild(titleElement);
+    cardElement.appendChild(yearElement);
+    
+    moviesDiv.appendChild(cardElement);
   }
 }
 
+themeToggle.addEventListener("click", toggleTheme);
+searchBtn.addEventListener("click", startSearch);
+loadMoreBtn.addEventListener("click", loadNextPage);
 
-function displayMovies(movies) {
-  moviesDiv.innerHTML = "";
+inputElement.addEventListener("keypress", function(event) {
+  if (event.key === "Enter") {
+    startSearch();
+  }
+});
 
-  movies.forEach(movie => {
-    const card = document.createElement("div");
-    card.classList.add("card");
-
-    card.innerHTML = `
-      <img src="${movie.Poster !== "N/A" ? movie.Poster : ""}">
-      <h3>${movie.Title}</h3>
-      <p>${movie.Year}</p>
-    `;
-
-    moviesDiv.appendChild(card);
-  });
+function initializePage() {
+  loadTheme();
+  
+  currentQuery = "Avengers";
+  currentPageNumber = 1;
+  moviesDiv.innerHTML = "<p class='empty'>Loading...</p>";
+  
+  fetchMoviesFromAPI(currentQuery, currentPageNumber);
 }
+
+window.addEventListener("DOMContentLoaded", initializePage);
