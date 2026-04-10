@@ -1,5 +1,3 @@
-var API_KEY = "8eafd0d9";
-
 var searchBtn = document.getElementById("searchBtn");
 var inputElement = document.getElementById("searchInput");
 var moviesDiv = document.getElementById("movies");
@@ -53,7 +51,7 @@ function loadNextPage() {
 }
 
 function fetchMoviesFromAPI(query, pageNumber) {
-  var url = "https://www.omdbapi.com/?s=" + query + "&page=" + pageNumber + "&apikey=" + API_KEY;
+  var url = "/api/movies?query=" + query + "&page=" + pageNumber;
   
   fetch(url)
     .then(function(response) {

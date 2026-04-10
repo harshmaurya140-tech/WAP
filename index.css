@@ -8,13 +8,54 @@ body {
   font-family: Arial, sans-serif;
   background: #0f172a;
   color: white;
+  transition: background 0.3s, color 0.3s;
 }
 
+body.light-mode {
+  background: #f5f5f5;
+  color: #333;
+}
 
 header {
   text-align: center;
   padding: 20px;
   background: #020617;
+  transition: background 0.3s;
+}
+
+body.light-mode header {
+  background: #e0e0e0;
+}
+
+.header-top {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.header-top h1 {
+  flex: 1;
+  text-align: center;
+}
+
+.theme-toggle {
+  position: absolute;
+  right: 20px;
+  padding: 10px 12px;
+  background: #3b82f6;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.theme-toggle:hover {
+  background: #2563eb;
+  transform: scale(1.1);
 }
 
 .search-box {
@@ -27,6 +68,13 @@ input {
   border-radius: 5px;
   border: none;
   outline: none;
+  transition: background 0.3s, color 0.3s;
+}
+
+body.light-mode input {
+  background: #fff;
+  color: #333;
+  border: 1px solid #ccc;
 }
 
 button {
@@ -37,16 +85,19 @@ button {
   background: #3b82f6;
   color: white;
   cursor: pointer;
+  transition: 0.3s;
 }
 
+button:hover {
+  background: #2563eb;
+}
 
 .movies {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(5, 1fr);
   gap: 20px;
   padding: 20px;
 }
-
 
 .card {
   background: #1e293b;
@@ -54,6 +105,12 @@ button {
   border-radius: 10px;
   text-align: center;
   transition: 0.3s;
+}
+
+body.light-mode .card {
+  background: #fff;
+  color: #333;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .card:hover {
@@ -72,9 +129,44 @@ button {
   opacity: 0.6;
 }
 
+.load-more-btn {
+  display: block;
+  margin: 30px auto;
+  padding: 12px 30px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.load-more-btn:hover {
+  background: #2563eb;
+}
 
 @media (max-width: 768px) {
   input {
     width: 180px;
+  }
+  
+  .header-top {
+    flex-wrap: wrap;
+  }
+  
+  .theme-toggle {
+    position: static;
+    margin-top: 10px;
+  }
+
+  .movies {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .movies {
+    grid-template-columns: repeat(2, 1fr);
   }
 }

@@ -9,7 +9,10 @@
 <body>
 
 <header>
-  <h1>🎬 Movie Explorer</h1>
+  <div class="header-top">
+    <h1>🎬 Movie Explorer</h1>
+    <button id="themeToggle" class="theme-toggle" title="Toggle Dark/Light Mode">🌙</button>
+  </div>
 
   <div class="search-box">
     <input id="searchInput" type="text" placeholder="Search movies...">
@@ -21,6 +24,7 @@
   <div id="movies" class="movies">
     <p class="empty">Search for movies to begin...</p>
   </div>
+  <button id="loadMoreBtn" class="load-more-btn" style="display: none;">Load More</button>
 </main>
 
 <script src="index.js"></script>
